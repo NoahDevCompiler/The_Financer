@@ -1,0 +1,53 @@
+﻿@using FinanceTool.Models
+@using Microsoft.AspNetCore.Authorization
+@using FinanceTool.Data
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Identity
+
+@inject UserManager<User> UserManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject ApplicationDbContext DbContext
+@page "/"
+
+<PageTitle>Home</PageTitle>
+
+<div class="container mt-4">
+    <div class="row g-4">
+        <!-- Karte -->
+        <div class="col-md-6">
+            <div class="card shadow-sm rounded-5">
+                <div class="header">
+                    Total Balance
+                </div>
+                <div class="card-body">
+                    $12,899.91
+                </div>
+                <div>Income (Monthly)</div>
+                <div>Expense (Monthly)</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private float? Balance;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+    }
+}
+<style>
+    .header {
+        font-size: 0.75rem;
+        font-weight: 100;
+        margin-top: 10px;
+        margin-left: 20px;
+
+    }
+    .card-body {
+        font-weight: 600;
+        font-size: 1.5rem;
+    }
+</style>
