@@ -1,12 +1,12 @@
 using FinanceTool.Components;
-using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Components.Server;
+using FinanceTool.Data;
+using FinanceTool.Data.Services;
 using FinanceTool.Models;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using FinanceTool.Data;
-
+using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Components.Server;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,6 +20,7 @@ builder.Services.AddIdentity<User, IdentityRole>(options => {
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 
+builder.Services.AddScoped<UserDataService>();
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 

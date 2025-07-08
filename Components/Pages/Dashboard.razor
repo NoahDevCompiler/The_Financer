@@ -1,12 +1,14 @@
 ﻿@using FinanceTool.Models
 @using Microsoft.AspNetCore.Authorization
 @using FinanceTool.Data
+@using FinanceTool.Components.Charts
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Identity
-
+@using FinanceTool.Data.Services
 @inject UserManager<User> UserManager
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject ApplicationDbContext DbContext
+@inject UserDataService UserData
 @page "/"
 
 <PageTitle>Home</PageTitle>
@@ -20,10 +22,20 @@
                     Total Balance
                 </div>
                 <div class="card-body">
-                    $12,899.91
+                    @Balance
                 </div>
                 <div>Income (Monthly)</div>
                 <div>Expense (Monthly)</div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card shadow-sm rounded-5">
+                <div class="header">
+                    Total Balance
+                </div>
+                <div class="card-body">
+                  <BalanceChart/>
+                </div>
             </div>
         </div>
     </div>
@@ -34,8 +46,11 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        var user = authState.User;
+        var user = await UserData.GetCurrentUser();
+        if (user == null) return;
+
+        Balance = user.Capital;
+
     }
 }
 <style>
