@@ -24,6 +24,8 @@ builder.Services.AddScoped<UserDataService>();
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
+builder.Services.AddBlazorBootstrap();
+
 builder.Services.AddRazorPages();
 
 var app = builder.Build();

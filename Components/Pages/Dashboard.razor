@@ -1,14 +1,12 @@
 ﻿@using FinanceTool.Models
 @using Microsoft.AspNetCore.Authorization
 @using FinanceTool.Data
-@using FinanceTool.Components.Charts
+@using FinanceTool.Components.Shared
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Identity
 @using FinanceTool.Data.Services
-@inject UserManager<User> UserManager
-@inject AuthenticationStateProvider AuthenticationStateProvider
-@inject ApplicationDbContext DbContext
-@inject UserDataService UserData
+@using FinanceTool.Components.Helpers
+
 @page "/"
 
 <PageTitle>Home</PageTitle>
@@ -17,16 +15,7 @@
     <div class="row g-4">
         <!-- Karte -->
         <div class="col-md-6">
-            <div class="card shadow-sm rounded-5">
-                <div class="header">
-                    Total Balance
-                </div>
-                <div class="card-body">
-                    @Balance
-                </div>
-                <div>Income (Monthly)</div>
-                <div>Expense (Monthly)</div>
-            </div>
+           <BalanceCard/>
         </div>
         <div class="col-md-6">
             <div class="card shadow-sm rounded-5">
@@ -34,25 +23,16 @@
                     Total Balance
                 </div>
                 <div class="card-body">
-                  <BalanceChart/>
+                    <BalanceChart/>
                 </div>
             </div>
         </div>
+        
+        <SavingsCard/>
+      
     </div>
 </div>
 
-@code {
-    private float? Balance;
-
-    protected override async Task OnInitializedAsync()
-    {
-        var user = await UserData.GetCurrentUser();
-        if (user == null) return;
-
-        Balance = user.Capital;
-
-    }
-}
 <style>
     .header {
         font-size: 0.75rem;

@@ -1,0 +1,72 @@
+﻿@using FinanceTool.Data
+@using FinanceTool.Models
+@using FinanceTool.Components.Helpers
+@using FinanceTool.Data.Services
+@using Microsoft.AspNetCore.Identity
+
+@inject ApplicationDbContext dbContext
+@inject UserManager<User> userManager
+@inject UserDataService userData
+
+<div class="col-md-6" >
+    <div class="card shadow-sm rounded-4 p-2" style="font-size: 0.9rem; max-width: 400px;">
+        
+        <div class="d-flex justify-content-between align-items-center px-3 pt-2 pb-1 fw-semibold fs-6 border-bottom">
+            Saving Goal
+            <a href="/transactions" class="text-info justify-content-end flex">See all</a>
+        </div>
+    
+        <div class="card-body pt-2 pb-2">
+            <div class="d-flex justify-content-between mb-1">
+                <span class="fw-bold">PC Gaming</span>
+                <span class="fw-bold">$222 / $250</span>
+            </div>
+    
+            <div class="progress mb-2" style="height: 8px;">
+                <div class="progress-bar" style="width:@Progress%;" role="progressbar" aria-valuenow="@Progress" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+    
+            <div class="text-muted fst-italic" style="font-size: 0.85rem;">
+                $128 to achieve your goal
+            </div>
+        </div>       
+    </div>
+    <button class="btn btn-primary rounded-3">Add Saving</button>
+    <ModalFormComponent @ref="savingsModal"
+                        Title="Neue Sparrate"
+                        OnValidSubmit="SaveSavingAsync">
+        <div class="mb-3">
+            <label>Target Amount:</label>
+            <InputNumber @bind-Value="newSaving.TargetAmount" class="form-control" />
+        </div>
+        <div class="mb-3">
+            <label>Current Amount:</label>
+            <InputNumber @bind-Value="newSaving.CurrentAmount" class="form-control" />
+        </div>
+        <div class="mb-3">
+            <label>Zieldatum:</label>
+            <InputDate @bind-Value="newSaving.TargetDate" class="form-control" />
+        </div>
+    </ModalFormComponent>
+</div>
+
+@code {
+    private int Progress = 80; 
+    private ModalFormComponent savingsModal;
+    private Savings newSaving = new();
+
+    private async Task SaveSavingAsync() {
+        var user = await userData.GetCurrentUser();
+
+        if (user == null) return;
+
+        newSaving.Id = Guid.NewGuid().ToString();
+        newSaving.UserId = user.Id;
+        // ForeCast oder andere Logik hier
+
+        Db.Savings.Add(newSaving);
+        await Db.SaveChangesAsync();
+
+        newSaving = new();  // Reset für nächsten Einsatz
+    }
+}

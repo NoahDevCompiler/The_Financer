@@ -5,6 +5,8 @@ namespace FinanceTool.Models
     {
         public float? Capital { get; set; }
         public DateTime? Birthdate { get; set; }
+        public ICollection<Transaction> Transactions { get; set; }
+        public ICollection<Savings> Savings { get; set; }
 
     }
 }

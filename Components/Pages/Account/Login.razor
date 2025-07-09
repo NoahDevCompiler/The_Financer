@@ -2,6 +2,7 @@
 @using FinanceTool.Models
 @using FinanceTool.Data
 @using System.Security.Claims
+@using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.AspNetCore.Identity
 @inject ApplicationDbContext appDbContext
 @inject SignInManager<User> signInManager
@@ -14,7 +15,7 @@
 }
 <EditForm Model="Model" OnValidSubmit="Authenticate" FormName="loginForm">
     <DataAnnotationsValidator />
-    <ValidationSummary />
+    <Microsoft.AspNetCore.Components.Forms.ValidationSummary />
     <div>
         <label for="email">E-Mail</label>
         <InputText id="email" class="form-control" @bind-Value="Model.Email"></InputText>

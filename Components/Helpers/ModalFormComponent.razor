@@ -1,0 +1,39 @@
+﻿@using FinanceTool.Models
+@using FinanceTool.Data
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Identity
+@inject ApplicationDbContext Db
+@inject UserManager<User> UserManager
+@inject AuthenticationStateProvider AuthStateProvider
+
+<BlazorBootstrap.Modal @ref="Modal" Title="@Title">
+    <ModalBody>
+        @ChildContent
+    </ModalBody>
+    <ModalFooter>
+        <button class="btn btn-secondary" @onclick="Hide">Abbrechen</button>
+        <button class="btn btn-primary" @onclick="OnSave">Speichern</button>
+    </ModalFooter>
+</BlazorBootstrap.Modal>
+
+@code {
+    private BlazorBootstrap.Modal Modal;
+
+    [Parameter] public string Title { get; set; }
+
+
+    [Parameter] public RenderFragment ChildContent { get; set; }
+
+
+    [Parameter] public EventCallback OnValidSubmit { get; set; }
+
+    public async Task Show() => await Modal.ShowAsync();
+    public async Task Hide() => await Modal.HideAsync();
+
+    private async Task OnSave()
+    {
+        if (OnValidSubmit.HasDelegate)
+            await OnValidSubmit.InvokeAsync(null);
+        await Hide();
+    }
+}

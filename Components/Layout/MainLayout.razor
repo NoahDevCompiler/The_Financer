@@ -3,16 +3,6 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inherits LayoutComponentBase
 
-<AuthorizeView>
-    <Authorized>
-        <span class="text-success">Hallo</span>
-        <button class="btn btn-sm btn-outline-danger">Logout</button>
-    </Authorized>
-    <NotAuthorized>
-        <a href="/login" class="btn btn-sm btn-outline-primary flex bottom-0 m-2 mb-2 position-fixed">Login</a>
-    </NotAuthorized>
-</AuthorizeView>
-
 <div class="d-flex">
     <div class="bg-light border-end p-3" style="width: 220px; min-height: 100vh;">
         <div class="mb-4">
@@ -32,3 +22,4 @@
     <a href="." class="reload">Reload</a>
     <span class="dismiss">🗙</span>
 </div>
+

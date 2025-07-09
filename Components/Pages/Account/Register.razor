@@ -2,14 +2,13 @@
 @using Microsoft.AspNetCore.Identity
 @using FinanceTool.Models.ViewModels
 @using FinanceTool.Components.Helpers
-@using System.ComponentModel.DataAnnotations;
 @using FinanceTool.Models
 @inject UserManager<User> UserManager
 @page "/register"
 
 <EditForm Model="Model" OnValidSubmit="RegisterUser" FormName="registerForm">
     <DataAnnotationsValidator />
-    <ValidationSummary />
+    <Microsoft.AspNetCore.Components.Forms.ValidationSummary />
     <div class="mb-3">
         <label>Email</label>
         <InputText class="form-control" @bind-Value="Model.Email" />
