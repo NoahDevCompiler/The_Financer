@@ -11,8 +11,11 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
+
+
+builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
 
 builder.Services.AddIdentity<User, IdentityRole>(options => {
     options.User.RequireUniqueEmail = true;
@@ -21,6 +24,7 @@ builder.Services.AddIdentity<User, IdentityRole>(options => {
     .AddDefaultTokenProviders();
 
 builder.Services.AddScoped<UserDataService>();
+builder.Services.AddScoped<SavingsService>();
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 

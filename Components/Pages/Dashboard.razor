@@ -6,32 +6,26 @@
 @using Microsoft.AspNetCore.Identity
 @using FinanceTool.Data.Services
 @using FinanceTool.Components.Helpers
-
+@attribute [Authorize]
 @page "/"
+@rendermode InteractiveServer
 
 <PageTitle>Home</PageTitle>
 
 <div class="container mt-4">
     <div class="row g-4">
-        <!-- Karte -->
         <div class="col-md-6">
-           <BalanceCard/>
+           <BalanceCard/> 
         </div>
-        <div class="col-md-6">
-            <div class="card shadow-sm rounded-5">
-                <div class="header">
-                    Total Balance
-                </div>
-                <div class="card-body">
-                    <BalanceChart/>
-                </div>
+        <div class="col-md-6">          
+            <div class="card-body">
+                <BalanceChart/>
             </div>
-        </div>
-        
-        <SavingsCard/>
-      
+        </div>     
+        <SavingsCard/>      
     </div>
 </div>
+
 
 <style>
     .header {

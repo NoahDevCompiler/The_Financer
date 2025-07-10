@@ -5,10 +5,6 @@
 <button @onclick="Logout" class="btn btn-outline-danger">Logout</button>
 
 @code {
-    private string message = "Blup";
-    private void TextClick() {
-        message = "Flup";
-    }
     private async Task Logout() {
         await userData.LogOutAsync();
     }

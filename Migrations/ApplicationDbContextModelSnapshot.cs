@@ -24,17 +24,21 @@ namespace FinanceTool.Migrations
 
             modelBuilder.Entity("FinanceTool.Models.Savings", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
 
-                    b.Property<float?>("CurrentAmount")
-                        .HasColumnType("real");
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<float?>("ForeCast")
-                        .HasColumnType("real");
+                    b.Property<decimal?>("ForeCast")
+                        .HasColumnType("decimal(18,2)");
 
-                    b.Property<float?>("TargetAmount")
-                        .HasColumnType("real");
+                    b.Property<string>("SavingGoal")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("TargetAmount")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime>("TargetDate")
                         .HasColumnType("datetime2");
@@ -52,11 +56,14 @@ namespace FinanceTool.Migrations
 
             modelBuilder.Entity("FinanceTool.Models.Transaction", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
 
-                    b.Property<float?>("Amount")
-                        .HasColumnType("real");
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime>("TransactionDate")
                         .HasColumnType("datetime2");
@@ -83,11 +90,11 @@ namespace FinanceTool.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
 
+                    b.Property<decimal?>("Balance")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<DateTime?>("Birthdate")
                         .HasColumnType("datetime2");
-
-                    b.Property<float?>("Capital")
-                        .HasColumnType("real");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()

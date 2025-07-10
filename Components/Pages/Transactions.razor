@@ -1,22 +1,9 @@
-﻿@page "/transactions"
+﻿@using FinanceTool.Components.Shared
+@page "/transactions"
 
 <PageTitle>Transactions</PageTitle>
 
-<div class="container mt-4">
-    <div class="row g-4">
-        <div class="col-md-6">
-            <div class="card shadow-sm rounded-3">
-                <div class="header bg-light">
-                    Total
-                </div>
-                <div class="card-body">
-                    <button @onclick="TextClick"></button>
-                    <p>@message</p>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+<TransactionsList></TransactionsList>
 
 @code {
     private string message = "String";

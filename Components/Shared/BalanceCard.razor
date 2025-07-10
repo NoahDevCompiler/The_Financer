@@ -1,13 +1,14 @@
 ﻿@using FinanceTool.Data.Services
+@using FinanceTool.Components.Helpers
 @inject UserDataService UserData
 
 <div class="card shadow-sm rounded-5 d-flex flex-column justify-content-between" style="max-width: 350px; max-height: 150px; height: 150px;">
     <div class="pt-2 ps-3 pe-3">
         <div class="fw-semibold text-muted small mb-1">
-            Total Balance
+           Total Balance
         </div>
         <div class="fw-bolder fs-5">
-            $@Balance
+            @FormatHelper.FormatCurrency(Balance)
         </div>
     </div>
 
@@ -37,13 +38,13 @@
 
 
 @code {
-    private float? Balance;
+    private decimal? Balance;
 
     protected override async Task OnInitializedAsync() {
 
-        var user = await UserData.GetCurrentUser();
-        if (user == null) return;
+        var balance = await UserData.GetBalance();
+        if (balance == null) return;
 
-        Balance = user.Capital;
-    }
+        Balance = balance;
+    }  
 }

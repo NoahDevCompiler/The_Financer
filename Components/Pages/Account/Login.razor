@@ -47,6 +47,7 @@
         {
             loginFailed = true;
             errorMessage = "No User Found";
+            return;
         }
 
         var result = await signInManager.PasswordSignInAsync(user.UserName, Model.Password, isPersistent: false, lockoutOnFailure: false);

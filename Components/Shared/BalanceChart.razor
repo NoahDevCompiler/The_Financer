@@ -1,6 +1,9 @@
-﻿@rendermode InteractiveServer
-
-<BarChart @ref="barChart" Width="550" Height="300" />
+﻿<div class="card shadow-sm rounded-5 d-flex flex-column justify-content-between">
+    <div class="fw-semibold text-muted  px-4 pt-2">
+        <h6>Total Balance</h6>
+    </div>
+    <BarChart @ref="barChart" Width="550" Height="300" />
+</div>
 
 @code {
     private BarChart barChart = default!;
@@ -13,7 +16,7 @@
     private string[] months = { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" };
 
     protected override void OnInitialized() {
-        chartData = new ChartData { Labels = GetDefaultDataLabels(6), Datasets = GetDefaultDataSets(3) };
+        chartData = new ChartData { Labels = GetDefaultDataLabels(6), Datasets = GetDefaultDataSets(2) };
         barChartOptions = new BarChartOptions { 
             Responsive = true, 
             Interaction = new Interaction { Mode = InteractionMode.Index },
@@ -55,11 +58,12 @@
         datasetsCount += 1;
 
         return new BarChartDataset() {
-            Label = $"Product {datasetsCount}",
+            Label = $"Expense {datasetsCount}",
             Data = GetRandomData(),
             BackgroundColor = new List<string> { c.ToRgbString() },
             BorderColor = new List<string> { c.ToRgbString() },
             BorderWidth = new List<double> { 0 },
+            BorderRadius = new List<double> {5}
         };
     }
     private List<double?> GetRandomData() {

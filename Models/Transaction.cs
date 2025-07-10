@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace FinanceTool.Models
 {
@@ -10,9 +11,17 @@ namespace FinanceTool.Models
     }
     public class Transaction
     {
-        public string Id { get; set; }
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int Id { get; set; }
+
+        [Required]
         public string UserId { get; set; } 
-        public float? Amount { get; set; }
+
+        [Required]
+        public decimal? Amount { get; set; }
+
+        [Required]
         public DateTime TransactionDate { get; set; }
         public TransactionType TransactionType { get; set; }
 

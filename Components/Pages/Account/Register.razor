@@ -3,7 +3,9 @@
 @using FinanceTool.Models.ViewModels
 @using FinanceTool.Components.Helpers
 @using FinanceTool.Models
+@using FinanceTool.Data.Services
 @inject UserManager<User> UserManager
+@inject UserDataService userData
 @page "/register"
 
 <EditForm Model="Model" OnValidSubmit="RegisterUser" FormName="registerForm">
@@ -29,7 +31,7 @@
     </div>
 
     <div class="mb-5">
-        <InputNumber @bind-Value="Model.Capital" DisplayName="Capital"></InputNumber>
+        <InputNumber TValue="decimal?" @bind-Value="Model.Balance" DisplayName="Capital"></InputNumber>
     </div>
 
     <p class="text-danger">@errorMessage</p>
@@ -49,12 +51,13 @@
             Email = Model.Email,
             UserName = Model.Username,
             Birthdate = Model.Birthday,
-            Capital = Model.Capital       
+            Balance = Model.Balance       
         };
         var result = await UserManager.CreateAsync(user, Model.Password);
 
         if (result.Succeeded) {
-            
+            await userData.SignInUser(user);
+
         } else {
             errorMessage = string.Join("", result.Errors.Select(e => e.Description));
         }
