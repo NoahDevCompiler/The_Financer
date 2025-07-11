@@ -19,11 +19,14 @@ namespace FinanceTool.Models
         public string UserId { get; set; } 
 
         [Required]
-        public decimal? Amount { get; set; }
+        public string TransactionName { get; set; }
 
         [Required]
+        public decimal? Amount { get; set; }
+
         public DateTime TransactionDate { get; set; }
-        public TransactionType TransactionType { get; set; }
+        public TransactionType? TransactionType { get; set; }
+        public string Category { get; set; }
 
         public User User { get; set; }
     }

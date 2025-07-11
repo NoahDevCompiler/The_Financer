@@ -23,8 +23,14 @@ builder.Services.AddIdentity<User, IdentityRole>(options => {
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 
+
+builder.Services.AddServerSideBlazor()
+    .AddCircuitOptions(options => { options.DetailedErrors = true; });
+
 builder.Services.AddScoped<UserDataService>();
 builder.Services.AddScoped<SavingsService>();
+builder.Services.AddScoped<TransactionService>();
+builder.Services.AddScoped<LogoMatcher>();
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
@@ -47,10 +53,21 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.Use(async (context, next) => {
+    if (context.Request.Path.StartsWithSegments("/_blazor") ||
+        context.Request.Path.StartsWithSegments("/login") ||
+        context.Request.Path.StartsWithSegments("/register")) {
+        context.Features.Set<Microsoft.AspNetCore.Antiforgery.IAntiforgeryValidationFeature>(null!);
+    }
+    await next();
+});
+
 app.UseAntiforgery();
 
-app.MapStaticAssets();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
+
+app.MapStaticAssets();
+
 
 app.Run();

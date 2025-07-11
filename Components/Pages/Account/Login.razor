@@ -4,18 +4,18 @@
 @using System.Security.Claims
 @using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.Mvc
 @inject ApplicationDbContext appDbContext
 @inject SignInManager<User> signInManager
 @inject NavigationManager navigationManager
+@attribute [IgnoreAntiforgeryToken]
 
 @page "/login"
 
 @if (loginFailed) {
     <div class="alert alert-danger">@errorMessage</div>
 }
-<EditForm Model="Model" OnValidSubmit="Authenticate" FormName="loginForm">
-    <DataAnnotationsValidator />
-    <Microsoft.AspNetCore.Components.Forms.ValidationSummary />
+<EditForm  Model="Model" OnSubmit="Authenticate">
     <div>
         <label for="email">E-Mail</label>
         <InputText id="email" class="form-control" @bind-Value="Model.Email"></InputText>
@@ -33,7 +33,6 @@
 
 
 @code {
-    [SupplyParameterFromForm]
     public LoginViewModel Model { get; set; } = new();
 
     private string? errorMessage;

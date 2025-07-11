@@ -6,7 +6,6 @@
 @using Microsoft.AspNetCore.Identity
 @using FinanceTool.Data.Services
 @using FinanceTool.Components.Helpers
-@attribute [Authorize]
 @page "/"
 @rendermode InteractiveServer
 
@@ -22,7 +21,10 @@
                 <BalanceChart/>
             </div>
         </div>     
-        <SavingsCard/>      
+        <SavingsCard/>  
+        <div class="col-md-6">
+            <TransactionsList/>
+        </div>
     </div>
 </div>
 
