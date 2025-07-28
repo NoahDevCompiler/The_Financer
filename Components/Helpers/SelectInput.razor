@@ -1,0 +1,94 @@
+﻿@using Microsoft.AspNetCore.Components.Web
+@inject IJSRuntime JS
+
+<div class="position-relative w-100" @ref="BoxContainer">
+    <button @onclick="ToggleDropdown"
+            class="btn w-100 border border-secondary bg-white px-3 py-2 text-start d-flex justify-content-between align-items-center"
+            aria-expanded="@ShowList">
+        <span>@(SelectedOption ?? "Wähle oder Füge eine Option hinzu")</span>
+        <span class="position-absolute end-0 top-50 translate-middle-y me-3">
+            <svg xmlns="http://www.w3.org/2000/svg" class="transition justify-content-between flex-column d-flex" 
+                 style="@((ShowList ? "transform: rotate(180deg);" : "")); transition: transform 0.3s; width: 22px" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+        </span>
+    </button>
+
+    @if (ShowList)
+    {
+        <div class="position-absolute z-3 mt-1 w-100 border rounded border-secondary bg-white shadow">
+            <input @bind="SearchTerm" @bind:event="oninput" @onkeydown="HandleKeyDown"
+                   placeholder="Search Option"
+                   class="form-control rounded-0 border-bottom" />
+            <div style="max-height: 160px; overflow-y: auto;">
+                @foreach (var option in FilteredOptions)
+                {
+                    <div class="d-flex align-items-center px-3 py-2 list-group-item list-group-item-action"
+                         style="cursor: pointer;"
+                         @onclick="@(() => SelectOption(option))">
+                        <span>@option</span>
+                        <button @onclick:stopPropagation="true" @onclick="() => DeleteOption(option)"
+                                class="btn btn-sm btn-link text-danger ms-auto"
+                                aria-label="Option löschen">
+                            <i class="bi bi-garbage"></i>
+                        </button>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+
+@code {
+    private ElementReference BoxContainer;
+
+    [Parameter]
+    public List<string> AvailableOptions { get; set; } = new();
+
+    [Parameter]
+    public string? SelectedOption { get; set; }
+
+    [Parameter]
+    public EventCallback<string> SelectedOptionChanged { get; set; }
+
+    [Parameter]
+    public EventCallback<List<string>> AvailableOptionsChanged { get; set; }
+
+    private bool ShowList { get; set; } = false;
+    private string SearchTerm { get; set; } = "";
+
+    private IEnumerable<string> FilteredOptions =>
+        AvailableOptions.Where(o => o.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase));
+
+    private void ToggleDropdown() {
+        ShowList = !ShowList;
+    }
+
+    private async Task SelectOption(string option) {
+        SelectedOption = option;
+        await SelectedOptionChanged.InvokeAsync(option);
+        ShowList = false;
+        SearchTerm = "";
+    }
+
+    private async Task DeleteOption(string option) {
+        AvailableOptions.Remove(option);
+        await AvailableOptionsChanged.InvokeAsync(AvailableOptions);
+        if (SelectedOption == option) {
+            SelectedOption = null;
+            await SelectedOptionChanged.InvokeAsync(null);
+        }
+    }
+
+    private async Task HandleKeyDown(KeyboardEventArgs e) {
+        if (e.Key == "Enter" && !string.IsNullOrWhiteSpace(SearchTerm)) {
+            var trimmed = SearchTerm.Trim();
+            if (!AvailableOptions.Contains(trimmed)) {
+                AvailableOptions.Add(trimmed);
+                await AvailableOptionsChanged.InvokeAsync(AvailableOptions);
+                await SelectOption(trimmed);
+            }
+        }
+    }
+}

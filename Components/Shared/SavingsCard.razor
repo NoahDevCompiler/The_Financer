@@ -1,0 +1,114 @@
+﻿@using FinanceTool.Data
+@using FinanceTool.Models
+@using FinanceTool.Components.Modals
+@using FinanceTool.Data.Services
+@using FinanceTool.Components.Helpers
+@using Microsoft.AspNetCore.Identity
+
+@inject ApplicationDbContext dbContext
+@inject UserManager<User> userManager
+@inject SavingsService savingsService
+@inject UserDataService userData
+@inject NavigationManager navigationManager
+
+
+<div class="card shadow-sm rounded-4 p-4" style="font-size: 0.9rem;">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h6 class="text-muted mb-1">Savings Plan</h6>
+            <h4>@savingsList.Count saving plans</h4>
+        </div>
+        <a href="/transactions" class="text-primary small">See more detail <i class="bi bi-box-arrow-up-right"></i></a>
+    </div>
+
+    <div class="d-flex flex-wrap gap-3">
+        @foreach (var saving in savingsList.Take(5)) {
+            decimal balance = Balance ?? 0;
+            decimal target = saving.TargetAmount ?? 0;
+            decimal progressPercent = target > 0 ? (balance / target * 100) : 0;
+            if (progressPercent > 100)
+            {
+                progressPercent = 100;
+            }
+            decimal amountNeeded = target - balance;
+            if (amountNeeded < 0) amountNeeded = 0;
+
+            <div class="border rounded-3 p-3" style="width: 200px;">
+                <div class="mb-2" style="height: 8px; background-color: #e0e0e0; border-radius: 4px;">
+                    <div class="h-100" style="width:@progressPercent%; background-color:@GetColorForIndex(savingsList.IndexOf(saving)); border-radius: 4px;"></div>
+                </div>
+
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <i class="bi bi-piggy-bank fs-4 text-muted"></i>
+                    <div>
+                        <strong>@saving.SavingGoal</strong><br />
+                        <small class="text-success fw-semibold">@FormatHelper.FormatCurrency(balance)</small>
+                        <small class="text-muted"> / @FormatHelper.FormatCurrency(target)</small>
+                    </div>
+                </div>
+
+                <div class="text-muted small fst-italic">
+                    @FormatHelper.FormatCurrency(amountNeeded) to achieve your goal
+                </div>
+            </div>
+        }
+    </div>
+    @if (savingSaved) {
+        <Alert Color="AlertColor.Success" Style="max-width: 300px; max-height: 50px; position: fixed; top: 2px; right: 2px;">
+            <h4 class="alert-heading">SaveGoal Added!</h4>
+        </Alert>
+    }
+</div>
+    
+   
+    <Button @onclick="openModal" class="btn btn-primary rounded-3">Add Saving</Button>
+    <Modal @ref="modal" OnSavingAdded="handleNewSaving" />
+    
+
+@code {
+    private decimal? Balance;
+    private Savings newSaving = new();
+    private Modal modal = default!;
+    private List<Savings> savingsList = new List<Savings>();
+    private bool savingSaved = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Balance = await userData.GetBalance();
+        savingsList = await savingsService.GetSavingsAsync();
+    }
+
+    private async Task openModal()
+    {
+        var parameters = new Dictionary<string, object>();
+        parameters.Add("OnClickCallback", EventCallback.Factory.Create<Savings>(this, handleNewSaving));
+        await modal.ShowAsync<AddSavingModal>(title: "Add Saving Goal", parameters: parameters);
+    }
+
+    private async Task ShowAlertAsync() {
+        savingSaved = true;
+        StateHasChanged();
+
+        await Task.Delay(3000); 
+        savingSaved = false;
+        StateHasChanged();
+    }
+
+
+    private string GetColorForIndex(int index) {
+        var colors = new[] { "#7b5cff", "#00b388", "#f8d442", "#f06292" };
+        return colors[index % colors.Length];
+    }
+
+    private async Task handleNewSaving(Savings newSaving) 
+    {
+        var userId = await userData.GetUserId();
+        newSaving.UserId = userId;
+
+        await savingsService.AddSavingAsync(newSaving);
+        savingsList.Add(newSaving);
+        await modal.HideAsync();
+        await ShowAlertAsync();
+    }
+}
+

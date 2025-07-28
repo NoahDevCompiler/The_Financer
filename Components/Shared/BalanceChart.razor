@@ -1,0 +1,92 @@
+﻿<div class="card shadow-sm rounded-5 d-flex flex-column justify-content-between">
+    <div class="fw-semibold text-muted  px-4 pt-2">
+        <h6>Total Balance</h6>
+    </div>
+    <BarChart @ref="barChart" Width="550" Height="300" />
+</div>
+
+@code {
+    private BarChart barChart = default!;
+    private BarChartOptions barChartOptions = default!;
+    private ChartData chartData = default!;
+    private Random random = new();
+
+    private int datasetsCount = 0;
+    private int labelsCount = 0;
+    private string[] months = { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" };
+
+    protected override void OnInitialized() {
+        chartData = new ChartData { Labels = GetDefaultDataLabels(6), Datasets = GetDefaultDataSets(2) };
+        barChartOptions = new BarChartOptions { 
+            Responsive = true, 
+            Interaction = new Interaction { Mode = InteractionMode.Index },
+            Scales = new Scales
+            {
+                Y = new ChartAxes
+                {          
+                    Title = new ChartAxesTitle
+                    {
+                        Display = true,
+                        Text = "CHF"
+                    }
+                }
+            }
+            
+        };
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender) {
+        if (firstRender) {
+            await barChart.InitializeAsync(chartData, barChartOptions);
+        }
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    private List<IChartDataset> GetDefaultDataSets(int numberOfDatasets) {
+        var datasets = new List<IChartDataset>();
+
+        for (var index = 0; index < numberOfDatasets; index++) {
+            datasets.Add(GetRandomBarChartDataset());
+        }
+
+        return datasets;
+    }
+
+    private BarChartDataset GetRandomBarChartDataset() {
+        var c = ColorUtility.CategoricalTwelveColors[datasetsCount].ToColor();
+
+        datasetsCount += 1;
+
+        return new BarChartDataset() {
+            Label = $"Expense {datasetsCount}",
+            Data = GetRandomData(),
+            BackgroundColor = new List<string> { c.ToRgbString() },
+            BorderColor = new List<string> { c.ToRgbString() },
+            BorderWidth = new List<double> { 0 },
+            BorderRadius = new List<double> {5}
+        };
+    }
+    private List<double?> GetRandomData() {
+        var data = new List<double?>();
+        for (var index = 0; index < labelsCount; index++) {
+            data.Add(random.Next(1000000));
+        }
+
+        return data;
+    }
+
+    private List<string> GetDefaultDataLabels(int numberOfLabels) {
+        var labels = new List<string>();
+        for (var index = 0; index < numberOfLabels; index++) {
+            labels.Add(GetNextDataLabel());
+        }
+
+        return labels;
+    }
+
+    private string GetNextDataLabel()
+    {
+        labelsCount += 1;
+        return months[labelsCount - 1];
+    }
+}

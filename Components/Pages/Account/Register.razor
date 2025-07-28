@@ -1,0 +1,65 @@
+﻿@using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Identity
+@using FinanceTool.Models.ViewModels
+@using FinanceTool.Components.Helpers
+@using FinanceTool.Models
+@using FinanceTool.Data.Services
+@inject UserManager<User> UserManager
+@inject UserDataService userData
+@page "/register"
+
+<EditForm Model="Model" OnValidSubmit="RegisterUser" FormName="registerForm">
+    <DataAnnotationsValidator />
+    <Microsoft.AspNetCore.Components.Forms.ValidationSummary />
+    <div class="mb-3">
+        <label>Email</label>
+        <InputText class="form-control" @bind-Value="Model.Email" />
+    </div>
+
+    <div class="mb-3">
+        <label>Benutzername</label>
+        <InputText class="form-control" @bind-Value="Model.Username" />
+    </div>
+
+    <div class="mb-3">
+        <label>Passwort</label>
+        <InputText class="form-control" @bind-Value="Model.Password" type="password" />
+    </div>
+
+    <div class="mb-3">
+        <BirthdayInput @bind-Birthday="Model.Birthday"/>
+    </div>
+
+    <div class="mb-5">
+        <InputNumber TValue="decimal?" @bind-Value="Model.Balance" DisplayName="Capital"></InputNumber>
+    </div>
+
+    <p class="text-danger">@errorMessage</p>
+
+    <button class="btn btn-primary">Registrieren</button>
+</EditForm>
+
+@code {
+    [SupplyParameterFromForm]
+    public RegisterViewModel Model { get; set; } = new();
+
+    private string? errorMessage;
+
+    private async Task RegisterUser()
+    {
+        var user = new User { 
+            Email = Model.Email,
+            UserName = Model.Username,
+            Birthdate = Model.Birthday,
+            Balance = Model.Balance       
+        };
+        var result = await UserManager.CreateAsync(user, Model.Password);
+
+        if (result.Succeeded) {
+            await userData.SignInUser(user);
+
+        } else {
+            errorMessage = string.Join("", result.Errors.Select(e => e.Description));
+        }
+    }
+}

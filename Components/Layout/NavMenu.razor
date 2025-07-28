@@ -1,0 +1,108 @@
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@using FinanceTool.Data.Services
+@using FinanceTool.Components.Helpers
+
+<div class="nav flex-column position-relative">
+
+    <p class="left-1 text-secondary mb-0">General</p>
+    <NavLink href="/" Match="NavLinkMatch.All" class="nav-link">
+        <img src="assets/home.svg" width="20px" />Dashboard
+    </NavLink>
+    <NavLink href="transactions" class="nav-link">
+        <img src="assets/transactions.svg" width="20px" />Transactions
+    </NavLink>
+    <NavLink href="history" class="nav-link">
+        <img src="assets/history.svg" width="20px" />History
+    </NavLink>
+    <NavLink href="analytics" class="nav-link">
+        <img src="assets/analytics.svg" width="20px" />Analytics
+    </NavLink>
+
+    <p class="left-2 text-secondary mb-0 mt-3">Support</p>
+    
+    <NavLink href="analytics" class="nav-link">
+        <img src="assets/settings.svg" width="20px" />Settings
+    </NavLink>
+    <NavLink href="analytics" class="nav-link">
+        <img src="assets/ai-help.svg" width="20px" />AI
+        <div class="info-span rounded-2 px-2 py-0">Beta</div>
+    </NavLink>
+
+    <AuthorizeView>
+        <Authorized>
+            <div class="nav-item px-3 bottom-0 m-2 flex position-fixed">
+                <form action="/logout">
+                    <button class="nav-link text-danger">
+                        <span class="bi  text-danger"></span> Logout
+                    </button>
+                </form>
+            </div>
+        </Authorized>
+        <NotAuthorized>
+            <a href="/login" class="nav-item btn btn-sm btn-outline-primary flex bottom-0 m-2 mb-2 position-fixed">Login</a>
+        </NotAuthorized>
+    </AuthorizeView>
+</div>
+
+
+<style>
+
+    .info-span {
+        border: 2px solid #6f42c1;
+        font-size: 0.85rem;
+        line-height: 1.2;
+        user-select: none;
+        white-space: nowrap;
+        min-width: 50px;
+        text-align: center;
+        margin-left: 65px;
+    }
+
+    .nav {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        justify-content: flex-start;
+        text-align: left;
+    }
+
+    .nav p {
+        margin: 0; 
+        padding-left: 0.25rem; 
+    }
+
+    .nav .nav-link {
+        text-decoration: none !important;
+        color: inherit;
+        padding: 10px 15px;
+        border-radius: 6px;
+        background-color: transparent; 
+        border: none; 
+        transition: background-color 0.2s ease, border 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        margin-bottom: 12px;
+        transition: transform 0.3s ease;
+    }
+
+    .nav .nav-link:last-child {
+        margin-bottom: 0; 
+    }
+
+    .nav .nav-link:hover {
+        background-color: #e0e0e0; 
+        color: inherit;
+        transform: scale(1.1);
+    }
+
+    .nav .nav-link.active {
+        background-color: #ffffff;
+        border: 1px solid #ffffff;
+    }
+
+    .nav-link.active img {
+        filter: invert(35%) sepia(80%) saturate(500%) hue-rotate(180deg);
+    }
+</style>
+

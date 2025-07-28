@@ -1,0 +1,51 @@
+﻿@using FinanceTool.Models
+@using FinanceTool.Data
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Identity
+
+<div class="row">
+    <div class="col-5 col-md-3 text-end">Your Saving Goal</div>
+    <div class="col-7 col-md-9">
+        <InputText DisplayName="e.g Mercedes gt63s" @bind-Value="savingGoal"></InputText>
+    </div>
+</div>
+<div class="row">
+    <div class="col-5 col-md-3 text-end">Target Amount</div>
+    <div class="col-7 col-md-9">
+        <InputNumber TValue="decimal?" DisplayName="CHF" EnableMinMax="true" Min="1" @bind-Value="targetAmount"></InputNumber>
+    </div>
+</div>
+<div class="row">
+    <div class="col-5 col-md-3 text-end">Target Date</div>
+    <div class="col-7 col-md-9">
+        <DateInput TValue="DateTime" @bind-Value="targetDate" Placeholder="Enter Date" />
+    </div>
+</div>
+<div class="row">
+    <div class="col-5 col-md-3 text-end">Target Date</div>
+    <div class="col-7 col-md-9">
+       <Button @onclick="AddSavingAsync">Add Saving</Button>
+    </div>
+</div>
+
+@code {
+    [Parameter] public EventCallback<Savings> OnClickCallback { get; set; }
+
+    private DateTime targetDate = DateTime.Now;
+    private Savings saving;
+    private string savingGoal;
+    private decimal? targetAmount;
+
+
+    private async Task AddSavingAsync()
+    {
+        saving = new Savings { 
+            SavingGoal = savingGoal, 
+            TargetAmount = targetAmount, 
+            TargetDate = targetDate 
+        };
+        
+        await OnClickCallback.InvokeAsync(saving);
+        
+    }
+}

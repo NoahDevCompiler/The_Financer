@@ -1,0 +1,118 @@
+﻿@using FinanceTool.Components.Helpers
+@using FinanceTool.Models
+<div class="container">
+    <div class="row mb-3 align-items-center">
+        <div class="col-md-3 text-start text-nowrap fw-semibold">
+            Transaction Name
+        </div>
+        <div class="col-md-6 ms-auto">
+            <InputText @bind-Value="tName" class="form-control" />
+        </div>
+    </div>
+
+    <div class="row mb-3 align-items-center">
+        <div class="col-md-3 text-start text-nowrap fw-semibold">
+            Amount
+        </div>
+        <div class="col-md-6 ms-auto">
+            <InputNumber @bind-Value="tAmount" TValue="decimal" class="form-control" />
+        </div>
+    </div>
+
+    <div class="row mb-3 align-items-center">
+        <div class="col-md-3 text-end text-nowrap fw-semibold">
+            Transaction Type
+        </div>
+        <div class="col-md-6 ms-auto">
+            <Dropdown style=" z-index:10000; background-color: gainsboro; color: black;">
+                <DropdownToggleButton >@(tType?.ToString() ?? "Income / Expense")</DropdownToggleButton>
+                <DropdownMenu>
+                    @foreach (var item in new[] { TransactionType.Income, TransactionType.Expense, TransactionType.Transfer }) {
+                        <DropdownItem @onclick="() => SelectType(item)" Type="DropdownItemType.Link">@item</DropdownItem>
+                    }
+                </DropdownMenu>
+            </Dropdown>
+        </div>
+    </div>
+
+    <div class="row mb-3 align-items-center">
+        <div class="col-md-3 text-start text-nowrap fw-semibold">
+            Category
+        </div>
+        <div class="col-md-6 ms-auto">
+            <DateInput TValue="DateTime" @bind-Value="tDate" Placeholder="Transaction Date" />
+        </div>
+    </div>
+
+    <div class="row mb-3 align-items-center">
+        <div class="col-md-3 text-start text-nowrap fw-semibold">
+            Category
+        </div>
+        <div class="col-md-6 ms-auto">
+            <SelectInput @bind-AvailableOptions="options" @bind-SelectedOption="tCategory" />
+        </div>
+    </div>
+
+    <div class="row mt-4 justify-content-center">
+        <div class=" col-md-6">
+            <Button Class="btn btn-primary w-100" @onclick="AddTransactionAsync">Add</Button>
+        </div>
+    </div>
+    @if (!String.IsNullOrEmpty(message)) {
+        <Alert Color="AlertColor.Danger" Style="max-width: 300px; max-height: 50px; position: fixed; top: 2px; right: 2px;">
+            <h4 class="alert-heading">@message</h4>
+        </Alert>
+    }
+</div>
+
+@code {
+    [Parameter] public EventCallback<Transaction> OnClickCallback { get; set; }
+
+    private List<string> options = new() { "Spotify", "Netflix", "Paypal" };
+    private string? message;
+
+    private string tCategory;
+    private DateTime tDate = DateTime.Now;
+    private Transaction transaction;
+    private decimal tAmount;
+    private string tName;
+    private TransactionType? tType;
+
+    private void SelectType(TransactionType type)
+    {
+        tType = type;
+        StateHasChanged();
+    }
+
+    private async Task AddTransactionAsync() {
+        Transaction transaction = new Transaction {
+            TransactionName = tName,
+            Amount = tAmount,
+            TransactionType = tType,
+            TransactionDate = tDate,
+            Category = tCategory
+        };
+        if (!CorrectInput())
+        {
+            return;
+        }
+        await OnClickCallback.InvokeAsync(transaction);
+        message = null;
+    }
+    private bool CorrectInput()
+    {
+        var validations = new Dictionary<string, Func<bool>>
+        {
+            { "Please enter Transaction Name.", () => string.IsNullOrWhiteSpace(tName) },
+            { "Please enter valid amount.",     () => tAmount <= 0 },
+            { "please select Category",            () => string.IsNullOrWhiteSpace(tCategory) },
+            { "Please select Transaction Date",                 () => tDate == default }
+        };
+        message = validations.FirstOrDefault(v => v.Value()).Key;
+
+        if (String.IsNullOrEmpty(message)) {
+            return true;
+        } else return false;
+
+    }
+}

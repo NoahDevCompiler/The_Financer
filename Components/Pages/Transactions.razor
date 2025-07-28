@@ -1,0 +1,18 @@
+﻿@using FinanceTool.Components.Shared
+@using Microsoft.AspNetCore.Authorization
+@page "/transactions"
+@attribute [Authorize]
+
+<PageTitle>Transactions</PageTitle>
+
+<TransactionsList></TransactionsList>
+
+@code {
+    private string message = "String";
+
+    public void TextClick()
+    {
+        message = "ölasjdf89as8df";
+    }
+}
+

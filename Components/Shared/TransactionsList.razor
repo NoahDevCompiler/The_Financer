@@ -1,0 +1,105 @@
+﻿@using FinanceTool.Components.Modals
+@using FinanceTool.Models
+@using FinanceTool.Data.Services
+@using FinanceTool.Components.Helpers
+
+@inject UserDataService userData
+@inject TransactionService TransactionService
+@inject LogoMatcher LogoMatcher
+
+<div class="card shadow-sm rounded-4 mx-auto" style="max-width: 1080px; max-height: 100vh;">
+    <div class="p-4">
+        <div class="d-flex justify-content-between pb-4">
+        <h6 class="fw-semibold mb-3">List of transactions</h6>
+            <div class="flex-column justify-content-between">
+                <button class="rounded-5 btn btn-primary" @onclick="openModal">
+                    Create Transaction
+                    <i class="bi bi-patch-plus-fill"></i>
+                </button>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table mb-0 ">
+                <thead >
+                    <tr>
+                        <th>Payment</th>
+                        <th class="text-end">Amount</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody class="align-middle">
+                    @foreach(var t in transactionsList)
+                    {
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <img src="@LogoMatcher.GetBestMatchingLogo(t.TransactionName, t.TransactionType)" width="28">
+                                    <div>
+                                        <div class="fw-semibold">@t.TransactionName</div>
+                                        <small class="text-muted">@t.Category</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="text-end text-success fw-semibold">@FormatHelper.FormatCurrency(t.Amount)</td>
+                            <td><span class="fw-semibold">16 Oct 2023</span> / <small class="text-muted">@t.TransactionDate</small></td>
+                            <td><span class="badge bg-success-subtle text-success border border-success">Success</span></td>
+                        </tr>                  
+                     }                   
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<Modal @ref="modal" OnTransactionAdded="handleNewTransaction"/>
+
+@code  {
+    private Modal modal;
+    private List<Transaction> transactionsList = new List<Transaction>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        transactionsList = await TransactionService.GetTransactionsAsync();
+    }
+    private async Task openModal()
+    {
+        var parameters = new Dictionary<string, object>();
+        parameters.Add("OnClickCallback", EventCallback.Factory.Create<Transaction>(this, handleNewTransaction));
+
+        await modal.ShowAsync<AddTransactionModal>(title: "Add Transaction", parameters: parameters);
+    }
+    private async Task handleNewTransaction(Transaction newTransaction) {
+        var userId = await userData.GetUserId();
+        newTransaction.UserId = userId;
+   
+        await TransactionService.AddTransactionAsync(newTransaction);
+        transactionsList.Add(newTransaction);
+        await modal.HideAsync();
+    }
+}
+
+
+<style>
+    body {
+        user-select: none;
+    }
+    table thead th {
+        background-color: lightgray !important;       
+    }
+
+    thead th:first-child {
+        border: none;
+        border-top-left-radius: 12px;
+        border-bottom-left-radius: 12px;
+    }
+
+    thead th:last-child {
+        border: none;
+        border-top-right-radius: 12px;
+        border-bottom-right-radius: 12px;
+    }
+
+    tbody tr:nth-child(even) {
+        background-color: gray !important;
+    }
+</style>                           

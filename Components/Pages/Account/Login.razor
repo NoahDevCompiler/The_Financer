@@ -1,0 +1,68 @@
+﻿@using FinanceTool.Models.ViewModels
+@using FinanceTool.Models
+@using FinanceTool.Data
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.Mvc
+@inject ApplicationDbContext appDbContext
+@inject SignInManager<User> signInManager
+@inject NavigationManager navigationManager
+
+@page "/login"
+
+@if (loginFailed) {
+    <div class="alert alert-danger">@errorMessage</div>
+}
+<EditForm Model="Model" OnValidSubmit="Authenticate" FormName="loginForm">
+    <DataAnnotationsValidator />
+    <Microsoft.AspNetCore.Components.Forms.ValidationSummary />
+    <div>
+        <label for="email">E-Mail</label>
+        <InputText id="email" class="form-control" @bind-Value="Model.Email"></InputText>
+    </div>
+    <div class="mb-3">
+        <label for="password">Passwort</label>
+        <InputText id="password" type="password" class="form-control" @bind-Value="Model.Password" />
+    </div>
+    <button type="submit" class="btn btn-primary">Login</button>
+    <div class="mb-3">
+        No Account yet?
+        <a href="/register" class="text-primary">
+            Register now
+        </a>
+    </div>
+</EditForm>
+
+
+@code {
+
+    [SupplyParameterFromForm]
+    public LoginViewModel Model { get; set; } = new();
+
+    private string? errorMessage;
+    private bool loginFailed;
+
+    private async Task Authenticate()
+    {
+        var user = await signInManager.UserManager.FindByEmailAsync(Model.Email);
+
+        if (user == null)
+        {
+            loginFailed = true;
+            errorMessage = "No User Found";
+            return;
+        }
+
+        var result = await signInManager.PasswordSignInAsync(user.UserName, Model.Password, isPersistent: false, lockoutOnFailure: false);
+    
+        if (result.Succeeded) {
+            loginFailed = false;
+            navigationManager.NavigateTo("/");
+        } else {
+            loginFailed = true;
+            errorMessage = "Password or Email are Incorrect";
+        }
+    
+    }
+}

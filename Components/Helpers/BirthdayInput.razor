@@ -1,0 +1,84 @@
+﻿<div class="d-flex gap-2 align-items-center">
+    <input type="text" inputmode="numeric" min="1" max="31" maxlength="2"
+           @bind="day"
+           @ref="inputRefs[0]"
+           style="width: 3rem; text-align: center; border: none;"
+           placeholder="TT" />
+
+    <span>/</span>
+
+    <input type="text" min="1" max="12" maxlength="2"
+           @bind="month"
+           @ref="inputRefs[1]"
+           style="width: 3rem; text-align: center; border: none;"
+           placeholder="MM" />
+
+    <span>/</span>
+
+    <input type="text" min="1900" max="2100" maxlength="4"
+           @bind="year"
+           @ref="inputRefs[2]"
+           style="width: 4.5rem; text-align: center; border: none;"
+           placeholder="JJJJ" />
+</div>
+
+@code {
+    [Parameter]
+    public DateTime? Birthday { get; set; }                              
+
+    [Parameter]
+    public EventCallback<DateTime?> BirthdayChanged { get; set; }
+
+    private string? day;
+    private string? month;
+    private string? year;
+
+    private ElementReference[] inputRefs = new ElementReference[3];
+
+    private void UpdateBirthday() {
+        if (int.TryParse(day, out var d) && int.TryParse(month, out var m) && int.TryParse(year, out var y)) {
+            try {
+                var date = new DateTime(y, m, d);
+                Birthday = date;
+            }
+            catch {
+                Birthday = null;
+            }
+        } else {
+            Birthday = null;
+        }
+
+        BirthdayChanged.InvokeAsync(Birthday);
+    }
+
+    private string DisplayBirthday {
+        get {
+            if (int.TryParse(day, out var d) && int.TryParse(month, out var m) && int.TryParse(year, out var y)) {
+                try {
+                    var date = new DateTime(y, m, d);
+                    return date.ToString("dd.MM.yyyy");
+                }
+                catch {
+                    return "Invalid Date";
+                }
+            }
+            return "Please enter Birthday";
+        }
+    }
+}
+
+<style>
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    input[type=number] {
+        -moz-appearance: textfield;
+    }
+    input :active ::-webkit-inner-spin-button,
+    input :active ::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+    }
+</style>
