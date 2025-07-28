@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
 
 namespace FinanceTool.Data.Services
 {
@@ -11,7 +12,7 @@ namespace FinanceTool.Data.Services
     {
         private readonly AuthenticationStateProvider _authState;
         private readonly UserManager<User> _userManager;
-        private readonly IDbContextFactory<ApplicationDbContext> _contextFactory;
+        private readonly IDbContextFactory<ApplicationDbContext> _dbContextFactory;
         private readonly SignInManager<User> _signInManager;
         private readonly NavigationManager _navigation;
 
@@ -26,11 +27,12 @@ namespace FinanceTool.Data.Services
             _userManager = userManager;
             _signInManager = signInManager;
             _navigation = navigation;
-            _contextFactory = contextFactory;
+            _dbContextFactory = contextFactory;
         }
 
+        public event Action<decimal?>? OnBalanceChanged;
         public async Task<User?> GetCurrentUser() {
-            using var context = _contextFactory.CreateDbContext();
+            using var context = _dbContextFactory.CreateDbContext();
 
             var authState = await _authState.GetAuthenticationStateAsync();
             var userClaims = authState.User;
@@ -48,11 +50,21 @@ namespace FinanceTool.Data.Services
             var user = await GetCurrentUser();
             return user?.Balance;
         }
+        public async Task UpdateBalanceAsync(string userId, decimal? newBalance) {
+            using var context = _dbContextFactory.CreateDbContext();
+            var user = await context.Users.FindAsync(userId);
+            if (user == null) throw new Exception("User nicht gefunden");
+
+            user.Balance = newBalance;
+            await context.SaveChangesAsync();
+
+            OnBalanceChanged?.Invoke(newBalance);
+        }
         public async Task SignInUser(User user) {
 
             await _signInManager.SignInAsync(user, isPersistent: false);
             _navigation.NavigateTo("/", forceLoad: true);
-        }
+        }   
         public async Task LogOutAsync() {
 
             await _signInManager.SignOutAsync();

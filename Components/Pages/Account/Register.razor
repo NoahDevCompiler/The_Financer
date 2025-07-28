@@ -5,6 +5,7 @@
 @using FinanceTool.Models
 @using FinanceTool.Data.Services
 @inject UserManager<User> UserManager
+@inject TransactionService TransactionService
 @inject UserDataService userData
 @page "/register"
 
@@ -45,21 +46,35 @@
 
     private string? errorMessage;
 
-    private async Task RegisterUser()
-    {
-        var user = new User { 
-            Email = Model.Email,
-            UserName = Model.Username,
-            Birthdate = Model.Birthday,
-            Balance = Model.Balance       
-        };
+    private async Task RegisterUser() {
+        var user = new User {
+                Email = Model.Email,
+                UserName = Model.Username,
+                Birthdate = Model.Birthday,
+                Balance = Model.Balance
+            };
         var result = await UserManager.CreateAsync(user, Model.Password);
 
-        if (result.Succeeded) {
-            await userData.SignInUser(user);
 
+        if (result.Succeeded) {
+
+            if (Model.Balance > 0)
+            {
+                var startBalance = new Transaction {                   
+                        UserId = user.Id,
+                        TransactionName = "Start Capital",
+                        Amount = Model.Balance,
+                        TransactionType = TransactionType.Income,
+                        Category = "Capital",
+                        TransactionDate = DateTime.UtcNow
+                };
+                await TransactionService.AddTransactionAsync(startBalance, user.Id);
+            }
+            await userData.SignInUser(user);
         } else {
             errorMessage = string.Join("", result.Errors.Select(e => e.Description));
         }
+       
     }
+   
 }

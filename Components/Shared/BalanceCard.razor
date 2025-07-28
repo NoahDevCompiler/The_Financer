@@ -8,7 +8,7 @@
            Total Balance
         </div>
         <div class="fw-bolder fs-5">
-            @FormatHelper.FormatCurrency(Balance)
+            @FormatHelper.FormatCurrency(balance)
         </div>
     </div>
 
@@ -38,13 +38,19 @@
 
 
 @code {
-    private decimal? Balance;
+    private decimal? balance;
 
     protected override async Task OnInitializedAsync() {
-
-        var balance = await UserData.GetBalance();
-        if (balance == null) return;
-
-        Balance = balance;
+        UserData.OnBalanceChanged += OnBalanceChanged;
+        
+        balance = await UserData.GetBalance();
     }  
+    private void OnBalanceChanged(decimal? newBalance) {
+        balance = newBalance;
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose() {
+        UserData.OnBalanceChanged -= OnBalanceChanged;
+    }
 }
